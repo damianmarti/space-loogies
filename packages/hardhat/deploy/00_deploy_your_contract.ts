@@ -1,6 +1,5 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { Contract } from "ethers";
 
 /**
  * Deploys a contract named "YourContract" using the deployer account and
@@ -22,10 +21,9 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  await deploy("YourContract", {
+  const loogies = await deploy("YourCollectible", {
     from: deployer,
-    // Contract constructor arguments
-    args: [deployer],
+    args: [],
     log: true,
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.
@@ -33,8 +31,93 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   });
 
   // Get the deployed contract to interact with it after deploying.
-  const yourContract = await hre.ethers.getContract<Contract>("YourContract", deployer);
-  console.log("👋 Initial greeting:", await yourContract.greeting());
+  // const loogiesContract = await hre.ethers.getContract<Contract>("YourCollectible", deployer);
+
+  const fancyLoogies = await deploy("FancyLoogie", {
+    from: deployer,
+    args: [loogies.address],
+    log: true,
+    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
+    // automatically mining the contract deployment transaction. There is no effect on live networks.
+    autoMine: true,
+  });
+
+  // const fancyLoogiesContract = await hre.ethers.getContract<Contract>("FancyLoogie", deployer);
+
+  const spaceship1Render = await deploy("Spaceship1Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const spaceship2AuxRender = await deploy("Spaceship2AuxRender", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const spaceship2Render = await deploy("Spaceship2Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+    libraries: { Spaceship2AuxRender: spaceship2AuxRender.address },
+  });
+
+  const spaceship3Render = await deploy("Spaceship3Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const spaceship4Render = await deploy("Spaceship4Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const spaceship5Render = await deploy("Spaceship5Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const propulsion1Render = await deploy("Propulsion1Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const propulsion2Render = await deploy("Propulsion2Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  const propulsion3Render = await deploy("Propulsion3Render", {
+    from: deployer,
+    log: true,
+    autoMine: true,
+  });
+
+  await deploy("SpaceLoogie", {
+    from: deployer,
+    args: [loogies.address, fancyLoogies.address, fancyLoogies.address],
+    log: true,
+    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
+    // automatically mining the contract deployment transaction. There is no effect on live networks.
+    autoMine: true,
+    libraries: {
+      Spaceship1Render: spaceship1Render.address,
+      Spaceship2Render: spaceship2Render.address,
+      Spaceship3Render: spaceship3Render.address,
+      Spaceship4Render: spaceship4Render.address,
+      Spaceship5Render: spaceship5Render.address,
+      Propulsion1Render: propulsion1Render.address,
+      Propulsion2Render: propulsion2Render.address,
+      Propulsion3Render: propulsion3Render.address,
+    },
+  });
+
 };
 
 export default deployYourContract;

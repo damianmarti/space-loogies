@@ -1834,6 +1834,7 @@ __metadata:
     "@types/qrcode": ^1
     "@typescript-eslint/eslint-plugin": latest
     "@typescript-eslint/parser": latest
+    base64-sol: ^1.1.0
     chai: ^4.3.6
     dotenv: ^16.0.3
     envfile: ^6.18.0
@@ -1876,6 +1877,7 @@ __metadata:
     eslint-config-next: ^14.0.4
     eslint-config-prettier: ^8.5.0
     eslint-plugin-prettier: ^4.2.1
+    loogie-blo: ^0.0.3
     next: ^14.0.4
     next-themes: ^0.2.1
     nprogress: ^0.2.0
@@ -4458,6 +4460,13 @@ __metadata:
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 669632eb3745404c2f822a18fc3a0122d2f9a7a13f7fb8b5823ee19d1d2ff9ee5b52c53367176ea4ad093c332fd5ab4bd0ebae5a8e27917a4105a4cfc86b1005
+  languageName: node
+  linkType: hard
+
+"base64-sol@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "base64-sol@npm:1.1.0"
+  checksum: 9bea828af71e6adcf7c841cf0001e03bd1eae8cc1aef86daedb36f04117b2a626ac23631f700d56a24515f88c2021d7ebdbee4608369f66c53e51c0b4b39ee47
   languageName: node
   linkType: hard
 
@@ -9641,6 +9650,13 @@ __metadata:
     strip-ansi: ^7.0.1
     wrap-ansi: ^8.0.1
   checksum: 2c6b47dcce6f9233df6d232a37d9834cb3657a0749ef6398f1706118de74c55f158587d4128c225297ea66803f35c5ac3db4f3f617046d817233c45eedc32ef1
+  languageName: node
+  linkType: hard
+
+"loogie-blo@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "loogie-blo@npm:0.0.3"
+  checksum: a0a8fd0005904b8e591c64ea1f57d27a45042e6a1b3cccbb86565e184be6e5e47f8fa5e85099088ae8a198643686c86ed7d23f94a64015c8c9c7201c8cec6bfd
   languageName: node
   linkType: hard
 
