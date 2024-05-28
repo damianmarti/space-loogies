@@ -2,53 +2,55 @@
 
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
+import { gql, useQuery } from "urql";
 import { useAccount } from "wagmi";
-import { useWalletClient } from "wagmi";
-import { useScaffoldContract, useScaffoldContractRead } from "~~/hooks/scaffold-eth";
-import { notification } from "~~/utils/scaffold-eth";
 
 const Space: NextPage = () => {
   const { address: connectedAddress } = useAccount();
-  const { data: walletClient } = useWalletClient();
 
   const [yourLoogies, setYourLoogies] = useState<any[]>([]);
   const [isYourLoogiesLoading, setIsYourLoogiesLoading] = useState(true);
 
-  const { data: balance, isLoading: isBalanceLoading } = useScaffoldContractRead({
-    contractName: "SpaceLoogie",
-    functionName: "balanceOf",
-    args: [connectedAddress],
+  const LoogiesQuery = gql`
+    query Tokens($owner: String) {
+      tokens(where: { ownerId: $owner, kind: "SpaceLoogie" }) {
+        items {
+          id
+          tokenURI
+        }
+      }
+    }
+  `;
+
+  const [{ data: loogiesData }] = useQuery({
+    query: LoogiesQuery,
+    variables: {
+      owner: connectedAddress,
+    },
   });
 
-  const { data: loogieContract } = useScaffoldContract({ contractName: "YourCollectible", walletClient });
-
-  const { data: spaceContract } = useScaffoldContract({ contractName: "SpaceLoogie", walletClient });
+  console.log("loogiesData", loogiesData);
 
   useEffect(() => {
     const updateYourLoogies = async () => {
       setIsYourLoogiesLoading(true);
-      if (connectedAddress && balance && spaceContract) {
-        const tokenIds = await spaceContract.read.tokenIdsFromOwner([connectedAddress]);
-
-        console.log("tokenIds", tokenIds);
-
+      if (loogiesData && loogiesData.tokens.items.length > 0) {
         const collectibleUpdate: any[] = [];
-
-        // for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
-        for (let tokenIndex = 0; tokenIndex < tokenIds.length; tokenIndex++) {
+        const loogies = loogiesData.tokens.items;
+        for (let tokenIndex = 0; tokenIndex < loogies.length; tokenIndex++) {
           try {
-            // const tokenId = await spaceContract.read.tokenOfOwnerByIndex([connectedAddress, BigInt(tokenIndex)]);
-            const tokenId = tokenIds[tokenIndex];
-            console.log("tokenId", tokenId);
-            const tokenURI = await spaceContract.read.tokenURI([tokenId]);
-            console.log("tokenURI", tokenURI);
+            const id = loogies[tokenIndex].id;
+            const tokenId = id.split(":")[1];
+            const kind = loogies[tokenIndex].kind;
+            const tokenURI = loogies[tokenIndex].tokenURI;
             const jsonManifestString = atob(tokenURI.substring(29));
 
             try {
               const jsonManifest = JSON.parse(jsonManifestString);
-              console.log("jsonManifest", jsonManifest);
               collectibleUpdate.push({
-                id: tokenId,
+                id,
+                tokenId,
+                kind,
                 owner: connectedAddress,
                 top: Math.floor(Math.random() * 800),
                 left: Math.floor(Math.random() * 1800),
@@ -61,12 +63,15 @@ const Space: NextPage = () => {
             console.log(e);
           }
         }
+        console.log("collectibleUpdate", collectibleUpdate);
         setYourLoogies(collectibleUpdate.reverse());
-        setIsYourLoogiesLoading(false);
+      } else {
+        setYourLoogies([]);
       }
+      setIsYourLoogiesLoading(false);
     };
     updateYourLoogies();
-  }, [connectedAddress, balance]);
+  }, [loogiesData]);
 
   return (
     <>
@@ -78,16 +83,18 @@ const Space: NextPage = () => {
         <div className="layer"></div>
       </div>
 
-      {yourLoogies.map(loogie => {
-        return (
-          <img
-            src={loogie.image}
-            alt={loogie.name}
-            className="w-24 h-24 relative move-x"
-            style={{ top: loogie.top, left: loogie.left }}
-          />
-        );
-      })}
+      {!isYourLoogiesLoading &&
+        yourLoogies.map(loogie => {
+          return (
+            <img
+              key={loogie.id}
+              src={loogie.image}
+              alt={loogie.name}
+              className="w-24 h-24 relative move-x"
+              style={{ top: loogie.top, left: loogie.left }}
+            />
+          );
+        })}
     </>
   );
 };

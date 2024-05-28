@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
+import { gql, useQuery } from "urql";
 import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
-import { useScaffoldContract, useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 
 const Loogies: NextPage = () => {
@@ -14,30 +15,52 @@ const Loogies: NextPage = () => {
   const [yourLoogies, setYourLoogies] = useState<any[]>([]);
   const [isYourLoogiesLoading, setIsYourLoogiesLoading] = useState(true);
 
-  const { data: balance, isLoading: isBalanceLoading } = useScaffoldContractRead({
-    contractName: "YourCollectible",
-    functionName: "balanceOf",
-    args: [connectedAddress],
+  const LoogiesQuery = gql`
+    query Tokens($owner: String) {
+      tokens(where: { ownerId: $owner, kind_in: ["OptimisticLoogie", "FancyLoogie"] }) {
+        items {
+          id
+          kind
+          tokenURI
+        }
+      }
+    }
+  `;
+
+  const [{ data: loogiesData }] = useQuery({
+    query: LoogiesQuery,
+    variables: {
+      owner: connectedAddress,
+    },
   });
 
-  const { data: loogieContract } = useScaffoldContract({ contractName: "YourCollectible", walletClient });
+  console.log("loogiesData", loogiesData);
 
+  const { data: loogieContract } = useScaffoldContract({ contractName: "YourCollectible", walletClient });
+  const { data: fancyLoogieContract } = useScaffoldContract({ contractName: "FancyLoogie", walletClient });
   const { data: spaceContract } = useScaffoldContract({ contractName: "SpaceLoogie", walletClient });
 
   useEffect(() => {
     const updateYourLoogies = async () => {
       setIsYourLoogiesLoading(true);
-      if (connectedAddress && balance && loogieContract) {
+      if (fancyLoogieContract && loogiesData && loogiesData.tokens.items.length > 0) {
         const collectibleUpdate: any[] = [];
-        for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
+        const loogies = loogiesData.tokens.items;
+        for (let tokenIndex = 0; tokenIndex < loogies.length; tokenIndex++) {
           try {
-            const tokenId = await loogieContract.read.tokenOfOwnerByIndex([connectedAddress, BigInt(tokenIndex)]);
-            const tokenURI = await loogieContract.read.tokenURI([tokenId]);
+            const id = loogies[tokenIndex].id;
+            const tokenId = id.split(":")[1];
+            const kind = loogies[tokenIndex].kind;
+            let tokenURI = loogies[tokenIndex].tokenURI;
+            // we need to fetch the tokenURI on FancyLoogies because changing accessories are not tracked by the indexer
+            if (kind === "FancyLoogie") {
+              tokenURI = await fancyLoogieContract.read.tokenURI([tokenId]);
+            }
             const jsonManifestString = atob(tokenURI.substring(29));
 
             try {
               const jsonManifest = JSON.parse(jsonManifestString);
-              collectibleUpdate.push({ id: tokenId, owner: connectedAddress, ...jsonManifest });
+              collectibleUpdate.push({ id, tokenId, kind, owner: connectedAddress, ...jsonManifest });
             } catch (e) {
               console.log(e);
             }
@@ -45,21 +68,32 @@ const Loogies: NextPage = () => {
             console.log(e);
           }
         }
+        console.log("collectibleUpdate", collectibleUpdate);
         setYourLoogies(collectibleUpdate.reverse());
-        setIsYourLoogiesLoading(false);
+      } else {
+        setYourLoogies([]);
       }
+      setIsYourLoogiesLoading(false);
     };
     updateYourLoogies();
-  }, [connectedAddress, balance]);
+  }, [loogiesData]);
 
-  const handleMint = async (loogieId: bigint) => {
-    if (!loogieContract || !spaceContract) {
+  const handleMint = async (kind: string, loogieId: bigint) => {
+    if (!loogieContract || !fancyLoogieContract || !spaceContract) {
       notification.error("Contracts not loaded");
       return;
     }
 
-    await loogieContract.write.approve([spaceContract.address, loogieId]);
-    await spaceContract.write.mintItemWithLoogie([loogieId]);
+    if (kind === "OptimisticLoogie") {
+      await loogieContract.write.approve([spaceContract.address, loogieId]);
+      await spaceContract.write.mintItemWithLoogie([loogieId]);
+    } else if (kind === "FancyLoogie") {
+      await fancyLoogieContract.write.approve([spaceContract.address, loogieId]);
+      await spaceContract.write.mintItemWithFancyLoogie([loogieId]);
+    } else {
+      notification.error("Invalid Loogie kind");
+      return;
+    }
 
     notification.success("Minted SpaceLoogie");
   };
@@ -72,7 +106,7 @@ const Loogies: NextPage = () => {
             <span className="block text-4xl font-bold">Your Loogies</span>
           </h1>
           <div className="flex justify-center items-center space-x-2">
-            {isBalanceLoading || isYourLoogiesLoading ? (
+            {isYourLoogiesLoading ? (
               <p className="my-2 font-medium">Loading...</p>
             ) : (
               <div>
@@ -85,7 +119,7 @@ const Loogies: NextPage = () => {
                       >
                         <h2 className="text-xl font-bold">{loogie.name}</h2>
                         <img src={loogie.image} alt={loogie.name} className="w-48 h-48" />
-                        <button onClick={() => handleMint(loogie.id)} className="btn btn-primary">
+                        <button onClick={() => handleMint(loogie.kind, loogie.tokenId)} className="btn btn-primary">
                           Mint SpaceLoogie
                         </button>
                       </div>

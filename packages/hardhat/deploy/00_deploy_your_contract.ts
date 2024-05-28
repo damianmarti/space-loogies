@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
+import { Contract } from "ethers";
 
 /**
  * Deploys a contract named "YourContract" using the deployer account and
@@ -40,6 +41,19 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.
     autoMine: true,
+  });
+
+  const bows = await deploy("Bow", {
+    from: deployer,
+    log: true,
+    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
+    // automatically mining the contract deployment transaction. There is no effect on live networks.
+    autoMine: true,
+  });
+
+  const loogieCoin = await deploy("LoogieCoin", {
+    from: deployer,
+    log: true,
   });
 
   // const fancyLoogiesContract = await hre.ethers.getContract<Contract>("FancyLoogie", deployer);
@@ -99,12 +113,9 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
     autoMine: true,
   });
 
-  await deploy("SpaceLoogie", {
+  const spaceshipRender = await deploy("SpaceshipRender", {
     from: deployer,
-    args: [loogies.address, fancyLoogies.address, fancyLoogies.address],
     log: true,
-    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
-    // automatically mining the contract deployment transaction. There is no effect on live networks.
     autoMine: true,
     libraries: {
       Spaceship1Render: spaceship1Render.address,
@@ -118,6 +129,26 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
     },
   });
 
+  const spaceLoogie = await deploy("SpaceLoogie", {
+    from: deployer,
+    args: [loogies.address, fancyLoogies.address, bows.address, loogieCoin.address],
+    log: true,
+    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
+    // automatically mining the contract deployment transaction. There is no effect on live networks.
+    autoMine: true,
+    libraries: {
+      SpaceshipRender: spaceshipRender.address,
+    },
+  });
+
+  const LoogieCoin = await hre.ethers.getContract<Contract>("LoogieCoin", deployer);
+
+  await LoogieCoin.grantRole(hre.ethers.keccak256(hre.ethers.toUtf8Bytes("BURNER_ROLE")), spaceLoogie.address);
+
+  await LoogieCoin.grantRole(
+    hre.ethers.keccak256(hre.ethers.toUtf8Bytes("MINTER_ROLE")),
+    "0x92C8Fd39A4582E6Fe8bb5Be6e7Fdf6533566EA69",
+  );
 };
 
 export default deployYourContract;
