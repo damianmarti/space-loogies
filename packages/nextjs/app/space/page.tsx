@@ -30,6 +30,7 @@ const Space: NextPage = () => {
   });
 
   console.log("loogiesData", loogiesData);
+  console.log("isYourLoogiesLoading", isYourLoogiesLoading);
 
   useEffect(() => {
     const updateYourLoogies = async () => {
@@ -75,14 +76,6 @@ const Space: NextPage = () => {
 
   return (
     <>
-      <div className="bg"></div>
-
-      <div className="star-field">
-        <div className="layer"></div>
-        <div className="layer"></div>
-        <div className="layer"></div>
-      </div>
-
       {!isYourLoogiesLoading &&
         yourLoogies.map(loogie => {
           return (

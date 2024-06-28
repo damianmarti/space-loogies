@@ -29,8 +29,10 @@ ponder.on("YourCollectible:Transfer", async ({ event, context }) => {
     id: tokenId,
     create: {
       ownerId: event.args.to,
+      idNumber: event.args.tokenId,
       tokenURI: tokenUri,
       kind: "OptimisticLoogie",
+      spaceshipMinted: false,
     },
     update: {
       ownerId: event.args.to,

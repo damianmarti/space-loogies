@@ -10,9 +10,16 @@ export default createSchema((p) => ({
   }),
   Token: p.createTable({
     id: p.string(),
+    idNumber: p.bigint(),
     tokenURI: p.string(),
     ownerId: p.hex().references("Account.id"),
     kind: p.string(),
+    speed: p.bigint().optional(),
+    kms: p.bigint().optional(),
+    lastSpeedUpdate: p.bigint().optional(),
+    loogieId: p.bigint().optional(),
+    fancyLoogieId: p.bigint().optional(),
+    spaceshipMinted: p.boolean().optional(),
 
     owner: p.one("ownerId"),
     transferEvents: p.many("TransferEvent.tokenId"),

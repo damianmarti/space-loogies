@@ -22,10 +22,11 @@ type SpaceLoogieInfo = {
   tokenId: bigint;
 };
 
-const SpaceLoogies: NextPage = () => {
+const Leaderboard: NextPage = () => {
   const { address: connectedAddress } = useAccount();
 
   const [loogies, setLoogies] = useState<SpaceLoogieInfo[]>([]);
+  const [sortedLoogies, setSortedLoogies] = useState<SpaceLoogieInfo[]>([]);
   const [isLoogiesLoading, setIsLoogiesLoading] = useState(true);
 
   const {
@@ -36,7 +37,7 @@ const SpaceLoogies: NextPage = () => {
 
   const LoogiesQuery = gql`
     query Tokens {
-      tokens(where: { kind: "SpaceLoogie" }, orderBy: "idNumber", orderDirection: "desc") {
+      tokens(where: { kind: "SpaceLoogie" }) {
         items {
           id
           tokenURI
@@ -95,6 +96,9 @@ const SpaceLoogies: NextPage = () => {
             console.log(e);
           }
         }
+        console.log("collectibleUpdate", collectibleUpdate);
+        collectibleUpdate.sort((a, b) => (a.kms < b.kms ? -1 : 1));
+        console.log("collectibleUpdate sorted", collectibleUpdate);
         setLoogies(collectibleUpdate);
       } else {
         setLoogies([]);
@@ -104,6 +108,21 @@ const SpaceLoogies: NextPage = () => {
     updateLoogies();
   }, [loogiesData]);
 
+  useEffect(() => {
+    const sortLoogies = async () => {
+      if (loogies.length > 0 && blockNumber !== undefined) {
+        setSortedLoogies(
+          [...loogies].sort((a, b) =>
+            a.kms + (blockNumber - a.lastSpeedUpdate) * a.speed > b.kms + (blockNumber - b.lastSpeedUpdate) * b.speed
+              ? -1
+              : 1,
+          ),
+        );
+      }
+    };
+    sortLoogies();
+  }, [loogies, blockNumber]);
+
   return (
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
@@ -112,44 +131,60 @@ const SpaceLoogies: NextPage = () => {
             {isLoogiesLoading ? (
               <p className="my-2 font-medium">Loading...</p>
             ) : (
-              <div>
-                <div className="grid grid-cols-4 gap-16">
-                  {loogies.map(loogie => {
-                    return (
-                      <div
-                        key={loogie.name}
-                        className="flex flex-col bg-base-100 p-8 text-center items-center max-w-xs rounded-2xl border-2 border-black"
-                      >
-                        <h2 className="text-xl font-bold border-2 border-black rounded-2xl p-2 -mb-6 bg-white z-20">
-                          {loogie.name}
-                        </h2>
-                        <Image
-                          src={loogie.image}
-                          alt={loogie.name}
-                          width="300"
-                          height="300"
-                          className="border-2 border-black rounded-3xl p-6 pt-6 bg-gray-200"
-                        />
-                        <h3 className="text-xl font-bold border-2 border-black rounded-2xl p-2 -mt-6 bg-white z-20">
-                          <Address address={loogie.owner} />
-                        </h3>
-                        <div className="text-left w-full">
-                          <p className="mt-2 mb-2">
-                            <span className="font-bold">Distance:</span>
+              <div className="bg-white rounded-xl p-8">
+                <table>
+                  <thead className="border-b-2">
+                    <tr>
+                      <th className="p-2">Rank</th>
+                      <th className="p-2">Ship</th>
+                      <th className="p-2">Owner</th>
+                      <th className="p-2">
+                        Speed
+                        <br />
+                        (KM/block)
+                      </th>
+                      <th className="p-2">
+                        Distance
+                        <br />
+                        (KM)
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedLoogies.map((loogie, index) => {
+                      return (
+                        <tr className="pt-4" key={loogie.name}>
+                          <td className="font-bold text-4xl text-center p-4">
+                            <div className="rounded-xl bg-primary p-2 border-2 border-black">{index + 1}</div>
+                          </td>
+                          <td>
+                            <Image
+                              src={loogie.image}
+                              alt={loogie.name}
+                              width="150"
+                              height="150"
+                              className="border-2 border-black rounded-3xl p-6 pt-6 bg-gray-200 mt-4"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <div className="text-center mb-2 text-xl">{loogie.name}</div>
+                            <div className="border-2 border-black rounded-2xl p-2 bg-secondary">
+                              <Address address={loogie.owner} disableAddressCopy={true} />
+                            </div>
+                          </td>
+                          <td className="text-right text-2xl p-2">{loogie.speed.toString()}</td>
+                          <td className="text-right text-4xl p-2 font-bold">
                             {isLoadingBlockNumber || !isSuccessBlockNumber || !blockNumber ? (
                               <span className="loading loading-infinity"></span>
                             ) : (
-                              ` ${(loogie.kms + (blockNumber - loogie.lastSpeedUpdate) * loogie.speed).toString()} KMs`
+                              ` ${(loogie.kms + (blockNumber - loogie.lastSpeedUpdate) * loogie.speed).toString()}`
                             )}
-                          </p>
-                          <p className="mt-2">
-                            <span className="font-bold">Speed:</span> {loogie.speed.toString()} KMs/block
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -159,4 +194,4 @@ const SpaceLoogies: NextPage = () => {
   );
 };
 
-export default SpaceLoogies;
+export default Leaderboard;

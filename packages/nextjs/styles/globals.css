@@ -152,6 +152,20 @@ p {
 
 .move-x {
   animation-name: move;
-  animation-duration: 10s;
+  animation-duration: 20s;
   animation-iteration-count: infinite;
+}
+
+@layer components {
+  .btn {
+    border-width: 2px;
+    border-color: black;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .btn:hover {
+    border-width: 2px;
+    border-color: black;
+  }
 }

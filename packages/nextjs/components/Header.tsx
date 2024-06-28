@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
+import { SpaceLoogiesLogoFull } from "./assets/SpaceLoogiesLogoFull";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
@@ -16,13 +16,23 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Home",
-    href: "/",
+    label: "Spaceships",
+    href: "/spaceLoogies",
   },
   {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    label: "Leaderboard",
+    href: "/leaderboard",
+  },
+];
+
+export const menuMyLinks: HeaderMenuLink[] = [
+  {
+    label: "My Spaceships",
+    href: "/mySpaceLoogies",
+  },
+  {
+    label: "My Loogies",
+    href: "/myLoogies",
   },
 ];
 
@@ -39,8 +49,34 @@ export const HeaderMenuLinks = () => {
               href={href}
               passHref
               className={`${
-                isActive ? "bg-secondary shadow-md" : ""
-              } hover:bg-secondary hover:shadow-md focus:!bg-secondary active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col`}
+                isActive ? "bg-primary shadow-md" : "bg-white"
+              } hover:bg-primary hover:shadow-md focus:!bg-primary active:!text-neutral py-2 px-6 text-sm rounded-full gap-2 grid grid-flow-col border-2 border-black font-bold mr-2`}
+            >
+              {icon}
+              <span>{label}</span>
+            </Link>
+          </li>
+        );
+      })}
+    </>
+  );
+};
+
+export const HeaderMenuMyLinks = () => {
+  const pathname = usePathname();
+
+  return (
+    <>
+      {menuMyLinks.map(({ label, href, icon }) => {
+        const isActive = pathname === href;
+        return (
+          <li key={href}>
+            <Link
+              href={href}
+              passHref
+              className={`${
+                isActive ? "bg-primary shadow-md" : "bg-white"
+              } hover:bg-primary hover:shadow-md focus:!bg-primary active:!text-neutral py-2 px-6 text-sm rounded-full gap-2 grid grid-flow-col border-2 border-black font-bold mr-2`}
             >
               {icon}
               <span>{label}</span>
@@ -64,8 +100,8 @@ export const Header = () => {
   );
 
   return (
-    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-0 sm:px-2">
-      <div className="navbar-start w-auto lg:w-1/2">
+    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-black m-4 sm:px-2 bg-space-blue rounded-2xl w-auto border-2 border-black">
+      <div className="navbar-start w-auto">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
           <label
             tabIndex={0}
@@ -89,19 +125,18 @@ export const Header = () => {
           )}
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
-            <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold leading-tight">Scaffold-ETH</span>
-            <span className="text-xs">Ethereum dev stack</span>
+          <div className="flex relative w-48">
+            <SpaceLoogiesLogoFull />
           </div>
         </Link>
-        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
+        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2 mr-8">
           <HeaderMenuLinks />
         </ul>
       </div>
       <div className="navbar-end flex-grow mr-4">
+        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2 ml-8">
+          <HeaderMenuMyLinks />
+        </ul>
         <RainbowKitCustomConnectButton />
         <FaucetButton />
       </div>

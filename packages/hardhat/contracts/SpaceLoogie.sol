@@ -47,6 +47,9 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 	mapping(uint256 => bool) public usedLoogies;
 	mapping(uint256 => bool) public usedFancyLoogies;
 
+	event SpeedUpdate(uint256 indexed id, uint256 speed, uint256 kms);
+	event RenderUpdate(uint256 indexed id);
+
 	constructor(
 		address _loogies,
 		address _fancyLoogies,
@@ -142,10 +145,12 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		uint256 timePassed = block.number - spaceships[id].lastSpeedUpdate;
 		uint256 distance = timePassed * spaceships[id].speed;
 		spaceships[id].kms += distance;
-		spaceships[id].speed += 1;
+		spaceships[id].speed += amount;
 		spaceships[id].lastSpeedUpdate = block.number;
 
 		loogieCoin.burn(msg.sender, amount * 1000);
+
+		emit SpeedUpdate(id, spaceships[id].speed, spaceships[id].kms);
 	}
 
 	function tokenURI(uint256 id) public view override returns (string memory) {
@@ -260,15 +265,19 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		spaceships[id].kms += distance;
 		spaceships[id].speed = 0;
 		spaceships[id].lastSpeedUpdate = block.number;
+
+		emit SpeedUpdate(id, 0, spaceships[id].kms);
+		emit RenderUpdate(id);
 	}
 
 	function getBow(uint256 id) external {
 		require(msg.sender == ownerOf(id), "only the owner can get the bow!");
+		require(spaceships[id].bowId != 0, "the spaceship doesn't have a bow!");
 
-		if (spaceships[id].bowId != 0) {
-			bows.transferFrom(address(this), ownerOf(id), spaceships[id].bowId);
-			spaceships[id].bowId = 0;
-		}
+		bows.transferFrom(address(this), ownerOf(id), spaceships[id].bowId);
+		spaceships[id].bowId = 0;
+
+		emit RenderUpdate(id);
 	}
 
 	// to receive ERC721 tokens
@@ -324,7 +333,11 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		) {
 			spaceships[spaceLoogieId].speed = 1;
 			spaceships[spaceLoogieId].lastSpeedUpdate = block.number;
+
+			emit SpeedUpdate(spaceLoogieId, 1, spaceships[spaceLoogieId].kms);
 		}
+
+		emit RenderUpdate(spaceLoogieId);
 
 		return this.onERC721Received.selector;
 	}

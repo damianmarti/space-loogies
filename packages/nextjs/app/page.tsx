@@ -1,69 +1,99 @@
 "use client";
 
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
+import { gql, useQuery } from "urql";
 import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Address } from "~~/components/scaffold-eth";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
 
+  const [yourLoogies, setYourLoogies] = useState<any[]>([]);
+  const [isYourLoogiesLoading, setIsYourLoogiesLoading] = useState(true);
+  const [startIndex, setStartIndex] = useState(0);
+
+  const shipsPerRound = 5;
+
+  const LoogiesQuery = gql`
+    query Tokens($zero: BigInt) {
+      tokens(where: { kind: "SpaceLoogie", speed_gt: $zero }) {
+        items {
+          id
+          tokenURI
+        }
+      }
+    }
+  `;
+
+  const [{ data: loogiesData }] = useQuery({
+    query: LoogiesQuery,
+    variables: {
+      zero: 0,
+    },
+  });
+
+  console.log("loogiesData", loogiesData);
+
+  useEffect(() => {
+    const updateYourLoogies = async () => {
+      setIsYourLoogiesLoading(true);
+      if (loogiesData && loogiesData.tokens.items.length > 0) {
+        const collectibleUpdate: any[] = [];
+        const loogies = loogiesData.tokens.items;
+        for (let tokenIndex = startIndex; tokenIndex < startIndex + shipsPerRound; tokenIndex++) {
+          try {
+            const realTokenIndex = tokenIndex % loogies.length;
+            const id = loogies[realTokenIndex].id;
+            const tokenId = id.split(":")[1];
+            const kind = loogies[realTokenIndex].kind;
+            const tokenURI = loogies[realTokenIndex].tokenURI;
+            const jsonManifestString = atob(tokenURI.substring(29));
+
+            try {
+              const jsonManifest = JSON.parse(jsonManifestString);
+              collectibleUpdate.push({
+                id,
+                tokenId,
+                kind,
+                owner: connectedAddress,
+                top: Math.floor(Math.random() * 800),
+                left: Math.floor(Math.random() * 1800),
+                ...jsonManifest,
+              });
+            } catch (e) {
+              console.log(e);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+        console.log("collectibleUpdate", collectibleUpdate);
+        setYourLoogies(collectibleUpdate.reverse());
+        setTimeout(() => {
+          setStartIndex(startIndex + shipsPerRound);
+        }, 20000);
+      } else {
+        setYourLoogies([]);
+      }
+      setIsYourLoogiesLoading(false);
+    };
+    updateYourLoogies();
+  }, [loogiesData, startIndex]);
+
   return (
     <>
-      <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
-        </div>
-
-        <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {!isYourLoogiesLoading &&
+        yourLoogies.map(loogie => {
+          return (
+            <img
+              key={loogie.id}
+              src={loogie.image}
+              alt={loogie.name}
+              className="w-24 h-24 relative move-x"
+              style={{ top: loogie.top, left: loogie.left }}
+            />
+          );
+        })}
     </>
   );
 };
