@@ -23,6 +23,10 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Leaderboard",
     href: "/leaderboard",
   },
+  {
+    label: "About",
+    href: "/about",
+  },
 ];
 
 export const menuMyLinks: HeaderMenuLink[] = [
@@ -98,6 +102,7 @@ export const Header = () => {
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
   );
+  const pathname = usePathname();
 
   return (
     <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-black m-4 sm:px-2 bg-space-blue rounded-2xl w-auto border-2 border-black">
@@ -120,7 +125,19 @@ export const Header = () => {
                 setIsDrawerOpen(false);
               }}
             >
+              <li>
+                <Link
+                  href="/"
+                  passHref
+                  className={`${
+                    pathname === "/" ? "bg-primary shadow-md" : "bg-white"
+                  } hover:bg-primary hover:shadow-md focus:!bg-primary active:!text-neutral py-2 px-6 text-sm rounded-full gap-2 grid grid-flow-col border-2 border-black font-bold mr-2`}
+                >
+                  <span>Home</span>
+                </Link>
+              </li>
               <HeaderMenuLinks />
+              <HeaderMenuMyLinks />
             </ul>
           )}
         </div>

@@ -131,17 +131,17 @@ const Leaderboard: NextPage = () => {
             {isLoogiesLoading ? (
               <p className="my-2 font-medium">Loading...</p>
             ) : (
-              <div className="bg-white rounded-xl p-8">
+              <div className="bg-white rounded-xl p-2 sm:p-8">
                 <table>
                   <thead className="border-b-2">
                     <tr>
                       <th className="p-2">Rank</th>
                       <th className="p-2">Ship</th>
-                      <th className="p-2">Owner</th>
+                      <th className="p-2 hidden sm:table-cell">Owner</th>
                       <th className="p-2">
                         Speed
                         <br />
-                        (KM/block)
+                        <span className="text-xs sm:text-xl">(KM/block)</span>
                       </th>
                       <th className="p-2">
                         Distance
@@ -163,10 +163,10 @@ const Leaderboard: NextPage = () => {
                               alt={loogie.name}
                               width="150"
                               height="150"
-                              className="border-2 border-black rounded-3xl p-6 pt-6 bg-gray-200 mt-4"
+                              className="border-2 border-black rounded-3xl p-2 sm:p-6 bg-gray-200 mt-4"
                             />
                           </td>
-                          <td className="p-4">
+                          <td className="p-4 hidden sm:table-cell">
                             <div className="text-center mb-2 text-xl">{loogie.name}</div>
                             <div className="border-2 border-black rounded-2xl p-2 bg-secondary">
                               <Address address={loogie.owner} disableAddressCopy={true} />

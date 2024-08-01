@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import type { NextPage } from "next";
 import { gql, useQuery } from "urql";
 import { useAccount } from "wagmi";
@@ -56,8 +57,8 @@ const Home: NextPage = () => {
                 tokenId,
                 kind,
                 owner: connectedAddress,
-                top: Math.floor(Math.random() * 800),
-                left: Math.floor(Math.random() * 1800),
+                top: Math.floor(Math.random() * window.innerHeight),
+                left: Math.floor(Math.random() * window.innerWidth),
                 ...jsonManifest,
               });
             } catch (e) {
@@ -68,7 +69,7 @@ const Home: NextPage = () => {
           }
         }
         console.log("collectibleUpdate", collectibleUpdate);
-        setYourLoogies(collectibleUpdate.reverse());
+        setYourLoogies(collectibleUpdate);
         setTimeout(() => {
           setStartIndex(startIndex + shipsPerRound);
         }, 20000);
@@ -82,6 +83,13 @@ const Home: NextPage = () => {
 
   return (
     <>
+      <div className="text-center">
+        <p>
+          <Link href="/mySpaceLoogies" className="btn btn-primary text-xl">
+            Mint Spaceship
+          </Link>
+        </p>
+      </div>
       {!isYourLoogiesLoading &&
         yourLoogies.map(loogie => {
           return (

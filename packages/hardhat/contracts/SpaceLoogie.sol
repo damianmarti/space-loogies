@@ -5,8 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "base64-sol/base64.sol";
-import "./HexStrings.sol";
 
 import "./SpaceshipRender.sol";
 
@@ -17,9 +15,6 @@ abstract contract LoogieCoinContract {
 }
 
 contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
-	using Strings for uint256;
-	using Strings for uint8;
-	using HexStrings for uint160;
 	using Counters for Counters.Counter;
 
 	Counters.Counter private _tokenIds;
@@ -41,7 +36,13 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		uint256 speed;
 		uint256 lastSpeedUpdate;
 		bool flying;
+		bool free;
 	}
+
+	// all funds go to buidlguidl.eth
+	address payable public constant recipient =
+		payable(0xa81a6a910FeD20374361B35C451a4a44F86CeD46);
+	uint256 public price = 0.005 ether;
 
 	mapping(uint256 => Spaceship) public spaceships;
 	mapping(uint256 => bool) public usedLoogies;
@@ -62,16 +63,22 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		loogieCoin = LoogieCoinContract(_loogieCoin);
 	}
 
-	function mintItem(uint256 crewId, bool fancy) internal returns (uint256) {
+	function mintItem(
+		uint256 crewId,
+		bool free,
+		bool fancy
+	) internal returns (uint256) {
 		_tokenIds.increment();
 
 		uint256 id = _tokenIds.current();
 		_mint(msg.sender, id);
 
-		if (fancy) {
-			fancyLoogies.transferFrom(msg.sender, address(this), crewId);
-		} else {
-			loogies.transferFrom(msg.sender, address(this), crewId);
+		if (free) {
+			if (fancy) {
+				fancyLoogies.transferFrom(msg.sender, address(this), crewId);
+			} else {
+				loogies.transferFrom(msg.sender, address(this), crewId);
+			}
 		}
 
 		bytes32 predictableRandom = keccak256(
@@ -91,10 +98,11 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 			loogieId: fancy ? 0 : crewId,
 			fancyLoogieId: fancy ? crewId : 0,
 			bowId: 0,
-			flying: true,
+			flying: free,
 			kms: 0,
-			speed: 1,
-			lastSpeedUpdate: block.number
+			speed: free ? 1 : 0,
+			lastSpeedUpdate: block.number,
+			free: free
 		});
 
 		spaceships[id] = spaceship;
@@ -102,11 +110,20 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		return id;
 	}
 
+	function mintItemWithEth() public payable returns (uint256) {
+		require(msg.value >= price, "NOT ENOUGH");
+
+		(bool success, ) = recipient.call{ value: msg.value }("");
+		require(success, "could not send");
+
+		return mintItem(0, false, false);
+	}
+
 	function mintItemWithLoogie(uint256 loogieId) public returns (uint256) {
 		require(!usedLoogies[loogieId], "you can't use the same loogie twice!");
 		usedLoogies[loogieId] = true;
 
-		return mintItem(loogieId, false);
+		return mintItem(loogieId, true, false);
 	}
 
 	function mintItemWithFancyLoogie(
@@ -118,7 +135,7 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 		);
 		usedFancyLoogies[fancyLoogieId] = true;
 
-		return mintItem(fancyLoogieId, true);
+		return mintItem(fancyLoogieId, true, true);
 	}
 
 	function totalKms(uint256 id) public view returns (uint256) {
@@ -155,52 +172,28 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 
 	function tokenURI(uint256 id) public view override returns (string memory) {
 		require(_exists(id), "not exist");
-		string memory name = string(
-			abi.encodePacked("SpaceLoogie #", id.toString())
-		);
-		string memory description = string(
-			abi.encodePacked("OptimisticLoogie flying in space")
-		);
-		string memory image = Base64.encode(bytes(_generateSVGofTokenById(id)));
 
 		return
-			string(
-				abi.encodePacked(
-					"data:application/json;base64,",
-					Base64.encode(
-						bytes(
-							abi.encodePacked(
-								'{"name":"',
-								name,
-								'", "description":"',
-								description,
-								'", "external_url":"https://space.fancyloogies.com/spaceloogie/',
-								id.toString(),
-								'", "owner":"',
-								(uint160(ownerOf(id))).toHexString(20),
-								'", "image": "',
-								"data:image/svg+xml;base64,",
-								image,
-								'"}'
-							)
-						)
-					)
-				)
+			SpaceshipRender.tokenURI(
+				id,
+				ownerOf(id),
+				spaceships[id].loogieId,
+				spaceships[id].fancyLoogieId,
+				_generateSVGofTokenById(id)
 			);
 	}
 
 	function _generateSVGofTokenById(
 		uint256 id
 	) internal view returns (string memory) {
-		string memory svg = string(
-			abi.encodePacked(
-				'<svg width="1200" height="1582" viewBox="0 0 1200 1582" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
-				renderTokenById(id),
-				"</svg>"
-			)
-		);
-
-		return svg;
+		return
+			string(
+				abi.encodePacked(
+					'<svg width="1200" height="1582" viewBox="0 0 1200 1582" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+					renderTokenById(id),
+					"</svg>"
+				)
+			);
 	}
 
 	// Visibility is `public` to enable it being called by other contracts for composition.
@@ -250,12 +243,18 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 				ownerOf(id),
 				spaceships[id].loogieId
 			);
+			if (!spaceships[id].free) {
+				spaceships[id].loogieId = 0;
+			}
 		} else {
 			fancyLoogies.transferFrom(
 				address(this),
 				ownerOf(id),
 				spaceships[id].fancyLoogieId
 			);
+			if (!spaceships[id].free) {
+				spaceships[id].fancyLoogieId = 0;
+			}
 		}
 
 		spaceships[id].flying = false;
@@ -311,20 +310,34 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 
 		if (msg.sender == address(loogies)) {
 			require(
-				!spaceships[spaceLoogieId].flying &&
+				!spaceships[spaceLoogieId].flying,
+				"the space loogie is flying!"
+			);
+			require(
+				!spaceships[spaceLoogieId].free ||
 					spaceships[spaceLoogieId].loogieId == tokenId,
 				"this is not the space loogie owned by this loogie!"
 			);
 			spaceships[spaceLoogieId].flying = true;
+			if (!spaceships[spaceLoogieId].free) {
+				spaceships[spaceLoogieId].loogieId = tokenId;
+			}
 		}
 
 		if (msg.sender == address(fancyLoogies)) {
 			require(
-				!spaceships[spaceLoogieId].flying &&
+				!spaceships[spaceLoogieId].flying,
+				"the space loogie is flying!"
+			);
+			require(
+				!spaceships[spaceLoogieId].free &&
 					spaceships[spaceLoogieId].fancyLoogieId == tokenId,
 				"this is not the space loogie owned by this fancy loogie!"
 			);
 			spaceships[spaceLoogieId].flying = true;
+			if (!spaceships[spaceLoogieId].free) {
+				spaceships[spaceLoogieId].fancyLoogieId = tokenId;
+			}
 		}
 
 		if (

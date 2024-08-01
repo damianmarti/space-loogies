@@ -143,7 +143,7 @@ p {
 
   to {
     /*transform: translateX(1800px) translateY(1000px);*/
-    top: 300px;
+    top: 250px;
     left: calc(50% - 24px);
     width: 1px;
     height: 1px;

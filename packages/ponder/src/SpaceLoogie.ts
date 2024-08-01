@@ -39,11 +39,12 @@ ponder.on("SpaceLoogie:Transfer", async ({ event, context }) => {
       idNumber: event.args.tokenId,
       tokenURI: tokenUri,
       kind: "SpaceLoogie",
-      speed: 1n,
+      speed: (spaceship[4] === 0n && spaceship[5] === 0n) ? 0n : 1n,
       kms: 0n,
       lastSpeedUpdate: event.block.number,
       loogieId: spaceship[4],
       fancyLoogieId: spaceship[5],
+      free: spaceship[11],
     },
     update: {
       ownerId: event.args.to,

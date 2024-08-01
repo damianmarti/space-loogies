@@ -20,6 +20,7 @@ export default createSchema((p) => ({
     loogieId: p.bigint().optional(),
     fancyLoogieId: p.bigint().optional(),
     spaceshipMinted: p.boolean().optional(),
+    free: p.boolean().optional(),
 
     owner: p.one("ownerId"),
     transferEvents: p.many("TransferEvent.tokenId"),

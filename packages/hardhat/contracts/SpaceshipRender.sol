@@ -2,6 +2,8 @@
 pragma solidity 0.8.25;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "base64-sol/base64.sol";
+import "./HexStrings.sol";
 
 import "./Spaceship1Render.sol";
 import "./Spaceship2Render.sol";
@@ -26,6 +28,7 @@ abstract contract NFTContract {
 
 library SpaceshipRender {
 	using Strings for uint256;
+	using HexStrings for uint160;
 
 	function renderSpaceship(
 		uint256 spaceshipType,
@@ -104,5 +107,55 @@ library SpaceshipRender {
 		}
 
 		return result;
+	}
+
+	function tokenURI(
+		uint256 id,
+		address owner,
+		uint256 loogieId,
+		uint256 fancyLoogieId,
+		string memory svg
+	) public pure returns (string memory) {
+		string memory name = string.concat("SpaceLoogie #", id.toString());
+		string memory description;
+		if (loogieId != 0 || fancyLoogieId != 0) {
+			if (loogieId != 0) {
+				description = string.concat("Loogie #", loogieId.toString());
+			} else {
+				description = string.concat(
+					"Fancy Loogie #",
+					fancyLoogieId.toString()
+				);
+			}
+			description = string.concat(description, " flying in space");
+		} else {
+			description = string.concat("A empty Loogie spaceship");
+		}
+		string memory image = Base64.encode(bytes(svg));
+
+		return
+			string(
+				abi.encodePacked(
+					"data:application/json;base64,",
+					Base64.encode(
+						bytes(
+							abi.encodePacked(
+								'{"name":"',
+								name,
+								'", "description":"',
+								description,
+								'", "external_url":"https://space.fancyloogies.com/spaceloogie/',
+								id.toString(),
+								'", "owner":"',
+								(uint160(owner)).toHexString(20),
+								'", "image": "',
+								"data:image/svg+xml;base64,",
+								image,
+								'"}'
+							)
+						)
+					)
+				)
+			);
 	}
 }

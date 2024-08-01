@@ -2,16 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { NextPage } from "next";
 import { gql, useQuery } from "urql";
 import { createPublicClient, hexToBigInt, http } from "viem";
 import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
+import { OptimisticLoogiesLogoIcon } from "~~/components/assets/OptimisticLoogiesLogoIcon";
 import { useScaffoldContract } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
 import { notification } from "~~/utils/scaffold-eth";
 
-export const publicClient = createPublicClient({
+const publicClient = createPublicClient({
   chain: scaffoldConfig.targetNetworks[0],
   transport: http(),
 });
@@ -149,40 +151,59 @@ const MyLoogies: NextPage = () => {
               <p className="my-2 font-medium">Loading...</p>
             ) : (
               <div>
-                <div className="grid grid-cols-4 gap-16">
-                  {yourLoogies.map(loogie => {
-                    return (
-                      <div
-                        key={loogie.id}
-                        className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-2xl border-2 border-black"
+                {yourLoogies.length === 0 ? (
+                  <div className="my-2 text-xl bg-secondary border-2 border-black rounded-2xl p-8 text-center">
+                    <p className="font-bold">You don&apos;t have any Loogie.</p>
+                    <p className="mt-16">
+                      You can mint a <span className="font-bold">OptimiticLoogie</span> at the{" "}
+                      <span className="font-bold">OptimisticLoogies website</span>.
+                    </p>
+                    <p className="mt-8">
+                      <Link
+                        href="https://optimistic.loogies.io"
+                        target="_blank"
+                        className="btn btn-primary text-xl p-4 sm:px-24 px-12 h-24"
                       >
-                        <h2 className="text-xl font-bold border-2 border-black rounded-2xl p-2 -mb-6 bg-white z-20">
-                          {loogie.name}
-                        </h2>
-                        <Image
-                          src={loogie.image}
-                          alt={loogie.name}
-                          width="300"
-                          height="300"
-                          className="border-2 border-black rounded-3xl bg-gray-200"
-                        />
-                        <button
-                          onClick={() => handleMint(loogie.kind, loogie.tokenId)}
-                          className="btn btn-primary mt-8"
-                          disabled={loogie.spaceshipMinted || isMinting}
+                        <OptimisticLoogiesLogoIcon />
+                      </Link>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid sm:grid-cols-4 grid-cols-1 gap-16">
+                    {yourLoogies.map(loogie => {
+                      return (
+                        <div
+                          key={loogie.id}
+                          className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-2xl border-2 border-black"
                         >
-                          {isMinting ? (
-                            <span className="loading loading-dots loading-md"></span>
-                          ) : loogie.spaceshipMinted ? (
-                            "Minted"
-                          ) : (
-                            "Mint SpaceLoogie"
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+                          <h2 className="text-xl font-bold border-2 border-black rounded-2xl p-2 -mb-6 bg-white z-20">
+                            {loogie.name}
+                          </h2>
+                          <Image
+                            src={loogie.image}
+                            alt={loogie.name}
+                            width="300"
+                            height="300"
+                            className="border-2 border-black rounded-3xl bg-gray-200"
+                          />
+                          <button
+                            onClick={() => handleMint(loogie.kind, loogie.tokenId)}
+                            className="btn btn-primary mt-8"
+                            disabled={loogie.spaceshipMinted || isMinting}
+                          >
+                            {isMinting ? (
+                              <span className="loading loading-dots loading-md"></span>
+                            ) : loogie.spaceshipMinted ? (
+                              "Minted"
+                            ) : (
+                              "Mint SpaceLoogie"
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>

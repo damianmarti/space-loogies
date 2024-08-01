@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { NextPage } from "next";
 import { gql, useQuery } from "urql";
 import { useAccount, useBlockNumber } from "wagmi";
@@ -106,14 +107,21 @@ const SpaceLoogies: NextPage = () => {
 
   return (
     <>
-      <div className="flex items-center flex-col flex-grow pt-10">
+      <div className="flex items-center flex-col flex-grow">
         <div className="px-5">
           <div className="flex justify-center items-center space-x-2">
             {isLoogiesLoading ? (
               <p className="my-2 font-medium">Loading...</p>
             ) : (
               <div>
-                <div className="grid grid-cols-4 gap-16">
+                <div className="text-center pb-2">
+                  <p>
+                    <Link href="/mySpaceLoogies" className="btn btn-primary text-xl">
+                      Mint Spaceship
+                    </Link>
+                  </p>
+                </div>
+                <div className="grid sm:grid-cols-4 grid-cols-1 gap-16">
                   {loogies.map(loogie => {
                     return (
                       <div

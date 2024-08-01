@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Bow: {
-      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      address: "0x8A93d247134d91e0de6f96547cB0204e5BE8e5D8",
       abi: [
         {
           inputs: [],
@@ -542,7 +542,7 @@ const deployedContracts = {
       },
     },
     FancyLoogie: {
-      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      address: "0xb9bEECD1A582768711dE1EE7B0A1d582D9d72a6C",
       abi: [
         {
           inputs: [
@@ -1226,7 +1226,7 @@ const deployedContracts = {
       },
     },
     LoogieCoin: {
-      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      address: "0x40918Ba7f132E0aCba2CE4de4c4baF9BD2D7D849",
       abi: [
         {
           inputs: [],
@@ -1792,7 +1792,7 @@ const deployedContracts = {
       },
     },
     Propulsion1Render: {
-      address: "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      address: "0x5FeaeBfB4439F3516c74939A9D04e95AFE82C4ae",
       abi: [
         {
           inputs: [
@@ -1817,7 +1817,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Propulsion2Render: {
-      address: "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      address: "0x976fcd02f7C4773dd89C309fBF55D5923B4c98a1",
       abi: [
         {
           inputs: [
@@ -1842,7 +1842,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Propulsion3Render: {
-      address: "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      address: "0x19cEcCd6942ad38562Ee10bAfd44776ceB67e923",
       abi: [
         {
           inputs: [
@@ -1867,7 +1867,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     SpaceLoogie: {
-      address: "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      address: "0xfcDB4564c18A9134002b9771816092C9693622e3",
       abi: [
         {
           inputs: [
@@ -2134,6 +2134,19 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [],
+          name: "mintItemWithEth",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
           inputs: [
             {
               internalType: "uint256",
@@ -2243,6 +2256,32 @@ const deployedContracts = {
           outputs: [
             {
               internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "price",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "recipient",
+          outputs: [
+            {
+              internalType: "address payable",
               name: "",
               type: "address",
             },
@@ -2408,6 +2447,11 @@ const deployedContracts = {
             {
               internalType: "bool",
               name: "flying",
+              type: "bool",
+            },
+            {
+              internalType: "bool",
+              name: "free",
               type: "bool",
             },
           ],
@@ -2597,7 +2641,7 @@ const deployedContracts = {
       },
     },
     Spaceship1Render: {
-      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      address: "0xF32D39ff9f6Aa7a7A64d7a4F00a54826Ef791a55",
       abi: [
         {
           inputs: [
@@ -2660,7 +2704,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Spaceship2AuxRender: {
-      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      address: "0xd6e1afe5cA8D00A2EFC01B89997abE2De47fdfAf",
       abi: [
         {
           inputs: [
@@ -2717,7 +2761,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Spaceship2Render: {
-      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+      address: "0x99dBE4AEa58E518C50a1c04aE9b48C9F6354612f",
       abi: [
         {
           inputs: [
@@ -2742,7 +2786,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Spaceship3Render: {
-      address: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+      address: "0x6F6f570F45833E249e27022648a26F4076F48f78",
       abi: [
         {
           inputs: [
@@ -2805,7 +2849,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Spaceship4Render: {
-      address: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
+      address: "0xCA8c8688914e0F7096c920146cd0Ad85cD7Ae8b9",
       abi: [
         {
           inputs: [
@@ -2868,7 +2912,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Spaceship5Render: {
-      address: "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
+      address: "0xB0f05d25e41FbC2b52013099ED9616f1206Ae21B",
       abi: [
         {
           inputs: [
@@ -2912,7 +2956,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     SpaceshipRender: {
-      address: "0x9A676e781A523b5d0C0e43731313A708CB607508",
+      address: "0xD42912755319665397FF090fBB63B1a31aE87Cee",
       abi: [
         {
           inputs: [
@@ -3021,11 +3065,50 @@ const deployedContracts = {
           stateMutability: "pure",
           type: "function",
         },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "loogieId",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "fancyLoogieId",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "svg",
+              type: "string",
+            },
+          ],
+          name: "tokenURI",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "pure",
+          type: "function",
+        },
       ],
       inheritedFunctions: {},
     },
     YourCollectible: {
-      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      address: "0x2a810409872AfC346F9B5b26571Fd6eC42EA4849",
       abi: [
         {
           inputs: [],
