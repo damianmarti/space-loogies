@@ -7,12 +7,17 @@ ponder.on("FancyLoogie:Transfer", async ({ event, context }) => {
 
   const tokenId = `FancyLoogie:${event.args.tokenId.toString()}`;
 
-  const tokenUri = await client.readContract({
-    abi: FancyLoogie.abi,
-    address: FancyLoogie.address,
-    functionName: "tokenURI",
-    args: [event.args.tokenId],
-  });
+  let tokenUri = "";
+  try {
+    tokenUri = await client.readContract({
+      abi: FancyLoogie.abi,
+      address: FancyLoogie.address,
+      functionName: "tokenURI",
+      args: [event.args.tokenId],
+    });
+  } catch (e) {
+    console.log("Error reading tokenURI: ", event.args.tokenId, e);
+  }
 
   // Create an Account for the sender, or update the balance if it already exists.
   await Account.upsert({

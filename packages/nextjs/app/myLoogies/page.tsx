@@ -173,7 +173,7 @@ const MyLoogies: NextPage = () => {
                     {yourLoogies.map(loogie => {
                       return (
                         <div
-                          key={loogie.id}
+                          key={`${loogie.kind}_${loogie.id}`}
                           className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-2xl border-2 border-black"
                         >
                           <h2 className="text-xl font-bold border-2 border-black rounded-2xl p-2 -mb-6 bg-white z-20">
