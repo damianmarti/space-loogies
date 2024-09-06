@@ -108,17 +108,17 @@ const MyLoogies: NextPage = () => {
     let transactionHash;
     if (kind === "OptimisticLoogie") {
       await loogieContract.write.approve([spaceContract.address, loogieId]);
-      transactionHash = await spaceContract.write.mintItemWithLoogie([loogieId]);
+      transactionHash = await spaceContract.write.mintItemWithLoogie([loogieId], { gas: 500000n });
     } else if (kind === "FancyLoogie") {
       await fancyLoogieContract.write.approve([spaceContract.address, loogieId]);
-      transactionHash = await spaceContract.write.mintItemWithFancyLoogie([loogieId]);
+      transactionHash = await spaceContract.write.mintItemWithFancyLoogie([loogieId], { gas: 500000n });
     } else {
       notification.error("Invalid Loogie kind");
       setIsMinting(false);
       return;
     }
 
-    const transaction = await publicClient.getTransactionReceipt({
+    const transaction = await publicClient.waitForTransactionReceipt({
       hash: transactionHash,
     });
     console.log("transaction", transaction);
