@@ -414,8 +414,12 @@ const MySpaceLoogies: NextPage = () => {
                                   KMs/block
                                 </p>
                                 <div className="text-center">
-                                  <div className="tooltip" data-tip="Speed Up">
+                                  <div
+                                    className="tooltip"
+                                    data-tip={loogie.speed === 0n ? "No Loogie on Spaceship" : "Speed Up"}
+                                  >
                                     <button
+                                      disabled={loogie.speed === 0n}
                                       onClick={() => {
                                         setCurrentSpaceshipId(loogie.tokenId);
                                         setIsSpeedUpModalOpen(true);
