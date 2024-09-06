@@ -315,6 +315,7 @@ const MySpaceLoogies: NextPage = () => {
                         Mint Spaceship (0.005 ETH)
                       </button>
                     </p>
+                    <p className="font-bold">All Ether from sales goes to funds BuidlGuidl builders!!</p>
                   </div>
                 ) : (
                   <>
@@ -340,6 +341,7 @@ const MySpaceLoogies: NextPage = () => {
                           Mint Spaceship (0.005 ETH)
                         </button>
                       </p>
+                      <p className="font-bold text-white">All Ether from sales goes to funds BuidlGuidl builders!!</p>
                     </div>
                     <div className="grid sm:grid-cols-4 grid-cols-1 gap-16">
                       {yourLoogies.map(loogie => {
