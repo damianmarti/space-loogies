@@ -289,6 +289,20 @@ const MySpaceLoogies: NextPage = () => {
                 {yourLoogies.length === 0 ? (
                   <div className="my-2 text-xl bg-secondary border-2 border-black rounded-2xl sm:p-8 p-2 text-center">
                     <p className="font-bold">You don&apos;t have any Spaceships yet.</p>
+                    <p className="mt-8">
+                      Minting your Spaceship is a thrilling moment as it takes shape, ready to explore with your Loogie
+                      the vast digital cosmos.
+                    </p>
+                    <p className="mt-8">
+                      The stars stretch out before you as you soar through space, weaving through asteroids and racing
+                      past distant planets. Every lightyear brings you closer to the top of the leaderboard, where other
+                      explorers are chasing the same goal—to outfly and outlast.
+                    </p>
+                    <p className="mt-8">
+                      Soon, your Loogie reaches the top, as you fly further than anyone before. Your ship becomes a
+                      symbol of adventure and mastery of the unknown, proving that even in a limitless universe, you can
+                      always push beyond the horizon.
+                    </p>
                     <p className="mt-16">
                       You can mint a <span className="font-bold text-2xl">Free Spaceship</span> if you own a{" "}
                       <span className="font-bold">OptimisticLoogie</span> or a{" "}
