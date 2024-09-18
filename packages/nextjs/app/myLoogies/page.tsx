@@ -9,6 +9,7 @@ import { createPublicClient, hexToBigInt, http } from "viem";
 import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { OptimisticLoogiesLogoIcon } from "~~/components/assets/OptimisticLoogiesLogoIcon";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useScaffoldContract } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
 import { notification } from "~~/utils/scaffold-eth";
@@ -58,7 +59,7 @@ const MyLoogies: NextPage = () => {
   useEffect(() => {
     const updateYourLoogies = async () => {
       setIsYourLoogiesLoading(true);
-      if (fancyLoogieContract && loogiesData && loogiesData.tokens.items.length > 0) {
+      if (connectedAddress && fancyLoogieContract && loogiesData && loogiesData.tokens.items.length > 0) {
         const collectibleUpdate: any[] = [];
         const loogies = loogiesData.tokens.items;
         for (let tokenIndex = 0; tokenIndex < loogies.length; tokenIndex++) {
@@ -94,7 +95,7 @@ const MyLoogies: NextPage = () => {
     };
     console.log("useEffect");
     updateYourLoogies();
-  }, [Boolean(fancyLoogieContract), loogiesData]);
+  }, [Boolean(fancyLoogieContract), loogiesData, connectedAddress]);
 
   const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
@@ -141,6 +142,16 @@ const MyLoogies: NextPage = () => {
     await sleep(5000);
     reexecuteLoogiesQuery({ requestPolicy: "network-only" });
   };
+
+  if (!connectedAddress) {
+    return (
+      <div className="flex items-center flex-col flex-grow pt-10">
+        <div className="px-5">
+          <RainbowKitCustomConnectButton />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
