@@ -303,6 +303,13 @@ const MySpaceLoogies: NextPage = () => {
                       symbol of adventure and mastery of the unknown, proving that even in a limitless universe, you can
                       always push beyond the horizon.
                     </p>
+                    <p className="mt-8">
+                      You can find more information about the Spaceships and the Loogies at the{" "}
+                      <Link href="/about" className="underline">
+                        About Page
+                      </Link>
+                      .
+                    </p>
                     <p className="mt-16">
                       You can mint a <span className="font-bold text-2xl">Free Spaceship</span> if you own a{" "}
                       <span className="font-bold">OptimisticLoogie</span> or a{" "}
