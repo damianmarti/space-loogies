@@ -1,6 +1,7 @@
 import { createConfig } from "@ponder/core";
 import { http } from "viem";
 import deployedContracts from "../nextjs/contracts/deployedContracts";
+import externalContracts from "../nextjs/contracts/externalContracts";
 import scaffoldConfig from "../nextjs/scaffold.config";
 import * as chains from "viem/chains";
 
@@ -15,14 +16,20 @@ const networks = {
 
 console.log("networks", networks);
 
-const contractNames = Object.keys(deployedContracts[targetNetwork.id]);
+const deployedContractNames = Object.keys(deployedContracts[targetNetwork.id]);
+const externalContractNames = Object.keys(externalContracts[targetNetwork.id]);
+const contractNames = [...deployedContractNames, ...externalContractNames];
 
 const contracts = Object.fromEntries(contractNames.map((contractName) => {
+  const contractSource = deployedContracts[targetNetwork.id][contractName]
+    ? deployedContracts[targetNetwork.id]
+    : externalContracts[targetNetwork.id];
+
   return [contractName, {
     network: targetNetwork.name as string,
-    abi: deployedContracts[targetNetwork.id][contractName].abi,
-    address: deployedContracts[targetNetwork.id][contractName].address,
-    startBlock: deployedContracts[targetNetwork.id][contractName].startBlock || 0,
+    abi: contractSource[contractName].abi,
+    address: contractSource[contractName].address,
+    startBlock: contractSource[contractName].startBlock || 0,
   }];
 }));
 
