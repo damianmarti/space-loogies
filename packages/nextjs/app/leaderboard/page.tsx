@@ -140,6 +140,12 @@ const Leaderboard: NextPage = () => {
                       <th className="p-2 hidden sm:table-cell">Owner</th>
                       <th className="p-2">
                         Speed
+                        <div
+                          className="tooltip ml-2 text-green-600 cursor-pointer"
+                          data-tip="Speed up your spaceship using LoogieCoins"
+                        >
+                          ?
+                        </div>
                         <br />
                         <span className="text-xs sm:text-xl">(KM/block)</span>
                       </th>
