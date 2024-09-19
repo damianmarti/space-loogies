@@ -330,7 +330,7 @@ contract SpaceLoogie is ERC721, IERC721Receiver, Ownable {
 				"the space loogie is flying!"
 			);
 			require(
-				!spaceships[spaceLoogieId].free &&
+				!spaceships[spaceLoogieId].free ||
 					spaceships[spaceLoogieId].fancyLoogieId == tokenId,
 				"this is not the space loogie owned by this fancy loogie!"
 			);
