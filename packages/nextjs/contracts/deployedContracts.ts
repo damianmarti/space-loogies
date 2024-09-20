@@ -85,7 +85,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     SpaceLoogie: {
-      address: "0x452e30555990c3d850715348b8df0d9EB6811e11",
+      address: "0xE4b5513D0F2ab5Cf49dB09B313e7a51795ffd257",
       startBlock: 125363006,
       abi: [
         {
